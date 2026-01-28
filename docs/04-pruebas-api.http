@@ -1,0 +1,282 @@
+### HTTP File para probar la API
+### Beneficiarios Management System API Tests
+### Usar con VS Code REST Client o similar
+
+@baseUrl = http://localhost:5000/api
+@contentType = application/json
+
+### 1. Documentos de Identidad
+
+### Obtener todos los documentos activos
+GET {{baseUrl}}/documentos-identidad
+Content-Type: {{contentType}}
+
+###
+
+### 2. Beneficiarios
+
+### Obtener todos los beneficiarios
+GET {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+###
+
+### Obtener beneficiario por ID
+GET {{baseUrl}}/beneficiarios/1
+Content-Type: {{contentType}}
+
+###
+
+### Crear nuevo beneficiario (DNI - 8 dígitos numéricos)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Juan Carlos",
+  "apellidos": "Pérez González",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "12345678",
+  "fechaNacimiento": "1990-05-15"
+}
+
+###
+
+### Crear nuevo beneficiario (Pasaporte - 12 caracteres alfanuméricos)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "María Alejandra",
+  "apellidos": "Rodríguez Martínez",
+  "documentoIdentidadId": 2,
+  "numeroDocumento": "AB1234567890",
+  "fechaNacimiento": "1985-08-22"
+}
+
+###
+
+### Crear beneficiario con error de validación (longitud incorrecta)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Pedro",
+  "apellidos": "López",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "123",
+  "fechaNacimiento": "1992-03-10"
+}
+
+###
+
+### Crear beneficiario con error de validación (solo números requerido)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Ana",
+  "apellidos": "García",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "12A45678",
+  "fechaNacimiento": "1988-11-30"
+}
+
+###
+
+### Crear beneficiario con error de validación (menor de edad)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "José",
+  "apellidos": "Martínez",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "87654321",
+  "fechaNacimiento": "2010-05-15"
+}
+
+###
+
+### Actualizar beneficiario existente
+PUT {{baseUrl}}/beneficiarios/1
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Juan Carlos Modificado",
+  "apellidos": "Pérez González",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "12345678",
+  "fechaNacimiento": "1990-05-15",
+  "estado": 1
+}
+
+###
+
+### Eliminar (desactivar) beneficiario
+DELETE {{baseUrl}}/beneficiarios/1
+Content-Type: {{contentType}}
+
+###
+
+### 3. Escenarios de Error
+
+### Intentar obtener beneficiario inexistente
+GET {{baseUrl}}/beneficiarios/999
+Content-Type: {{contentType}}
+
+###
+
+### Intentar actualizar beneficiario inexistente
+PUT {{baseUrl}}/beneficiarios/999
+Content-Type: {{contentType}}
+
+{
+  "nombres": "No Existe",
+  "apellidos": "Test",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "12345678",
+  "fechaNacimiento": "1990-05-15",
+  "estado": 1
+}
+
+###
+
+### Intentar eliminar beneficiario inexistente
+DELETE {{baseUrl}}/beneficiarios/999
+Content-Type: {{contentType}}
+
+###
+
+### 4. Pruebas de Carga (Opcional)
+
+### Crear múltiples beneficiarios para pruebas
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Beneficiario Test {{random}}",
+  "apellidos": "Apellido Test {{random}}",
+  "documentoIdentidadId": 3,
+  "numeroDocumento": "{{randomInt}}",
+  "fechaNacimiento": "1985-01-01"
+}
+
+###
+
+### 5. Validaciones Específicas
+
+### Prueba con Cédula de Extranjería (10 dígitos numéricos)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Carlos",
+  "apellidos": "Hernández",
+  "documentoIdentidadId": 3,
+  "numeroDocumento": "1234567890",
+  "fechaNacimiento": "1975-06-20"
+}
+
+###
+
+### Prueba con Tarjeta de Identidad (8 dígitos numéricos)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Laura",
+  "apellidos": "Sánchez",
+  "documentoIdentidadId": 4,
+  "numeroDocumento": "87654321",
+  "fechaNacimiento": "2000-12-05"
+}
+
+###
+
+### 6. Casos Límite
+
+### Nombres muy largos (debería fallar)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Nombre muy muy muy muy muy muy muy muy muy muy muy muy muy muy muy muy muy muy largo que excede el límite permitido",
+  "apellidos": "Apellido",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "12345678",
+  "fechaNacimiento": "1990-05-15"
+}
+
+###
+
+### Campos vacíos (debería fallar)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "",
+  "apellidos": "",
+  "documentoIdentidadId": 0,
+  "numeroDocumento": "",
+  "fechaNacimiento": "1990-05-15"
+}
+
+###
+
+### Fecha inválida (debería fallar)
+POST {{baseUrl}}/beneficiarios
+Content-Type: {{contentType}}
+
+{
+  "nombres": "Test",
+  "apellidos": "Test",
+  "documentoIdentidadId": 1,
+  "numeroDocumento": "12345678",
+  "fechaNacimiento": "2030-01-01"
+}
+
+###
+
+### 7. Consultas con Filtros (si se implementan en el futuro)
+
+### Buscar beneficiarios por nombre
+GET {{baseUrl}}/beneficiarios?search=Juan
+Content-Type: {{contentType}}
+
+###
+
+### Filtrar por estado
+GET {{baseUrl}}/beneficiarios?estado=1
+Content-Type: {{contentType}}
+
+###
+
+### Paginación
+GET {{baseUrl}}/beneficiarios?page=1&limit=10
+Content-Type: {{contentType}}
+
+###
+
+### 8. Endpoints de Documentos (Pruebas adicionales)
+
+### Verificar que los documentos se carguen correctamente
+GET {{baseUrl}}/documentos-identidad
+Content-Type: {{contentType}}
+
+###
+
+### 9. Health Check (si se implementa)
+
+### Verificar estado del sistema
+GET {{baseUrl}}/health
+Content-Type: {{contentType}}
+
+###
+
+### 10. Metrics (si se implementan)
+
+### Obtener métricas del sistema
+GET {{baseUrl}}/metrics
+Content-Type: {{contentType}}
+
+###
